@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Produits</title>
+    <meta name="description" content="Système de gestion des fournisseurs">
+    <title>Gestion des Fournisseurs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
@@ -16,8 +17,8 @@
         <ul class="menu">
             <li><a href="/"><i class="fas fa-home"></i> <span>Accueil</span></a></li>
             <li><a href="/approvisionnements"><i class="fas fa-truck-loading"></i> <span>Approvisionnement</span></a></li>
-            <li class="active"><a href="/produits"><i class="fas fa-box"></i> <span>Produits</span></a></li>
-            <li><a href="/fournisseurs"><i class="fas fa-users"></i> <span>Fournisseurs</span></a></li>
+            <li><a href="/produits"><i class="fas fa-box"></i> <span>Produits</span></a></li>
+            <li class="active"><a href="/fournisseurs"><i class="fas fa-users"></i> <span>Fournisseurs</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <a href="/logout"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a>
@@ -29,45 +30,45 @@
             <button id="toggle-sidebar" class="toggle-btn">
                 <i class="fas fa-bars"></i>
             </button>
-            <h1>Gestion des Produits</h1>
+            <h1>Gestion des Fournisseurs</h1>
         </header>
 
         <div class="container">
             <div class="dashboard-header">
-                <h2><i class="fas fa-box"></i> Gestion des Produits</h2>
+                <h2><i class="fas fa-users"></i> Gestion des Fournisseurs</h2>
             </div>
 
             <div class="tabs">
                 <div class="tab active" data-tab="form-tab">
-                    <i class="fas fa-plus-circle"></i> Ajouter Produit
+                    <i class="fas fa-plus-circle"></i> Ajouter Fournisseur
                 </div>
                 <div class="tab" data-tab="list-tab">
-                    <i class="fas fa-list"></i> Liste des Produits
+                    <i class="fas fa-list"></i> Liste des Fournisseurs
                 </div>
             </div>
 
             <div id="form-tab" class="tab-content active">
-                <form id="product-form">
+                <form id="supplier-form">
                     <div class="form-header">
                         <div class="form-group">
-                            <label for="product-name">Nom du produit</label>
-                            <input type="text" id="product-name" placeholder="Nom du produit" required>
+                            <label for="supplier-name">Nom du fournisseur</label>
+                            <input type="text" id="supplier-name" placeholder="Nom du fournisseur" required>
                         </div>
                         <div class="form-group">
-                            <label for="product-stock">Quantité en stock</label>
-                            <input type="number" id="product-stock" placeholder="Quantité" required min="0">
+                            <label for="supplier-number">Numéro de téléphone</label>
+                            <input type="text" id="supplier-number" placeholder="Numéro de téléphone" required>
                         </div>
                         <div class="form-group">
-                            <label for="product-price">Prix unitaire (€)</label>
-                            <input type="number" id="product-price" placeholder="Prix unitaire" required min="0.01" step="0.01">
+                            <label for="supplier-email">Email</label>
+                            <input type="email" id="supplier-email" placeholder="Email" required>
                         </div>
                     </div>
 
                     <div class="form-actions main-actions">
-                        <button type="button" id="save-product-btn" class="primary-btn">
+                        <button type="button" id="save-supplier-btn" class="primary-btn">
                             <i class="fas fa-save"></i> Enregistrer
                         </button>
-                        <button type="button" id="cancel-product-btn" class="secondary-btn">
+                        <button type="button" id="cancel-supplier-btn" class="secondary-btn">
                             <i class="fas fa-times"></i> Annuler
                         </button>
                     </div>
@@ -77,22 +78,22 @@
             <div id="list-tab" class="tab-content">
                 <div class="filter-section">
                     <div class="search-bar">
-                        <input type="text" id="search-input" placeholder="Rechercher...">
+                        <input type="text" id="search-input" placeholder="Rechercher par nom...">
                         <button id="search-btn"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
 
                 <div class="table-responsive">
-                    <table id="product-table" class="data-table">
+                    <table id="supplier-table" class="data-table">
                         <thead>
                         <tr>
                             <th>Nom</th>
-                            <th>Quantité en stock</th>
-                            <th>Prix unitaire (€)</th>
+                            <th>Numéro</th>
+                            <th>Email</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
-                        <tbody id="product-list"></tbody>
+                        <tbody id="supplier-list"></tbody>
                     </table>
                 </div>
             </div>
@@ -100,6 +101,16 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='script-products.js') }}"></script>
+<div id="details-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-info-circle"></i> Détails du Fournisseur</h3>
+            <button class="close-modal">×</button>
+        </div>
+        <div class="modal-body" id="supplier-details"></div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script-suppliers.js') }}"></script>
 </body>
 </html>

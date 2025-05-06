@@ -104,8 +104,10 @@ class DatabaseConnection:
                 DATE_APPROV TEXT NOT NULL,
                 QTE INTEGER NOT NULL,
                 PRIX_ACQIS REAL NOT NULL,
-                PRODUIT_ID TEXT,
-                FOURNISSEUR_ID TEXT,
+                PRODUIT_ID TEXT NOT NULL,
+                FOURNISSEUR_ID TEXT NOT NULL,
+                REF TEXT,
+                NOTES TEXT,
                 FOREIGN KEY (PRODUIT_ID) REFERENCES PRODUITS(PRODUIT_ID),
                 FOREIGN KEY (FOURNISSEUR_ID) REFERENCES FOURNISSEURS(FOURNISSEUR_ID)
             )
@@ -164,17 +166,25 @@ class Fournisseur:
         }
 
 class Approvisionnement:
-    def __init__(self, approv_id: str, date_approv: str, qte: int, prix_acquis: float):
+    def __init__(self, approv_id: str, date_approv: str, qte: int, prix_acquis: float, produit_id: str, fournisseur_id: str, ref: str = "", notes: str = ""):
         self.db_table = DBTable("APPROVISIONNEMENTS")
         self.approv_id = approv_id
         self.date_approv = date_approv
         self.qte = qte
         self.prix_acquis = prix_acquis
+        self.produit_id = produit_id
+        self.fournisseur_id = fournisseur_id
+        self.ref = ref
+        self.notes = notes
 
     def format_dict(self) -> Dict[str, Any]:
         return {
             "APPROV_ID": self.approv_id,
             "DATE_APPROV": self.date_approv,
             "QTE": self.qte,
-            "PRIX_ACQIS": self.prix_acquis
+            "PRIX_ACQIS": self.prix_acquis,
+            "PRODUIT_ID": self.produit_id,
+            "FOURNISSEUR_ID": self.fournisseur_id,
+            "REF": self.ref,
+            "NOTES": self.notes
         }
