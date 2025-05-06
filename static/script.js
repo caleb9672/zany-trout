@@ -66,9 +66,13 @@ async function updateStats() {
   console.log('Approvisionnements chargés :', supplies); // Ajout pour débogage
   filteredSupplies = [...supplies];
   const totalSupplies = supplies.length;
-  const totalCost = supplies.reduce((sum, supply) => sum + (supply.QTE * supply.PRIX_ACQUIS), 0);
+  const totalCost = supplies.reduce((sum, supply) => {
+    const quantite = parseFloat(supply.QUANTITE) || 0;
+    const prix = parseFloat(supply.PRIX_ACQUIS) || 0;
+    return sum + (quantite * prix);
+  }, 0);
   document.getElementById('total-supplies').textContent = totalSupplies;
-  document.getElementById('total-cost').textContent = totalCost.toFixed(2) + ' €';
+  document.getElementById('total-cost').textContent = totalCost.toFixed(2) + ' XOF';
 }
 
 // Mettre à jour le résumé du formulaire
@@ -82,7 +86,7 @@ function updateFormSummary() {
     totalAmount += quantity * price;
   });
   document.getElementById('total-items').textContent = totalItems;
-  document.getElementById('total-amount').textContent = totalAmount.toFixed(2) + ' €';
+  document.getElementById('total-amount').textContent = totalAmount.toFixed(2) + ' XOF';
 }
 
 // Afficher la liste des approvisionnements
@@ -98,14 +102,17 @@ async function renderSupplies(page = 1) {
   paginatedSupplies.forEach((supply, index) => {
     const product = products.find(p => p.PRODUIT_ID === supply.PRODUIT_ID);
     const supplier = suppliers.find(s => s.FOURNISSEUR_ID === supply.FOURNISSEUR_ID);
+    const quantite = parseFloat(supply.QUANTITE) || 0;
+    const prixAcquis = parseFloat(supply.PRIX_ACQUIS) || 0;
+    const total = quantite * prixAcquis;
     const row = document.createElement('tr');
     row.classList.add('fade-in');
     row.innerHTML = `
       <td>${supply.REF || '-'}</td>
       <td>${product ? product.LIBELLE : supply.PRODUIT_ID}</td>
-      <td>${supply.QTE}</td>
-      <td>${parseFloat(supply.PRIX_ACQUIS).toFixed(2)}</td>
-      <td>${(supply.QTE * supply.PRIX_ACQUIS).toFixed(2)}</td>
+      <td>${supply.QUANTITE !== undefined ? quantite : 'undefined'}</td>
+      <td>${!isNaN(prixAcquis) ? prixAcquis.toFixed(2) : '0.00'}</td>
+      <td>${!isNaN(total) ? total.toFixed(2) : '0.00'}</td>
       <td>${supplier ? supplier.NOM : supply.FOURNISSEUR_ID}</td>
       <td>${supply.NOTES || '-'}</td>
       <td>${new Date(supply.DATE_APPROV).toLocaleDateString('fr-FR')}</td>
@@ -155,7 +162,7 @@ async function addSupplyEntry() {
       </div>
       <div class="form-group">
         <label>Prix</label>
-        <input type="number" class="price" placeholder="Prix unitaire (€)" required min="0.01" step="0.01">
+        <input type="number" class="price" placeholder="Prix unitaire (XOF)" required min="0.01" step="0.01">
       </div>
       <div class="form-group">
         <label>Fournisseur</label>
@@ -221,7 +228,7 @@ async function resetForm() {
         </div>
         <div class="form-group">
           <label>Prix</label>
-          <input type="number" class="price" placeholder="Prix unitaire (€)" required min="0.01" step="0.01">
+          <input type="number" class="price" placeholder="Prix unitaire (XOF)" required min="0.01" step="0.01">
         </div>
         <div class="form-group">
           <label>Fournisseur</label>
@@ -282,6 +289,11 @@ document.getElementById('save-btn').addEventListener('click', async function() {
       if (!produitId || !qte || !prixAcquis || !fournisseurId) {
         valid = false;
         alert('Veuillez remplir tous les champs obligatoires pour chaque approvisionnement.');
+        return;
+      }
+      if (isNaN(parseFloat(qte)) || isNaN(parseFloat(prixAcquis))) {
+        valid = false;
+        alert('La quantité et le prix doivent être des nombres valides.');
         return;
       }
       newSupplies.push({
@@ -430,12 +442,15 @@ async function showDetails(index) {
   const supplier = suppliers.find(s => s.FOURNISSEUR_ID === supply.FOURNISSEUR_ID);
   const modal = document.getElementById('details-modal');
   const details = document.getElementById('supply-details');
+  const quantite = parseFloat(supply.QUANTITE) || 0;
+  const prixAcquis = parseFloat(supply.PRIX_ACQUIS) || 0;
+  const total = quantite * prixAcquis;
   details.innerHTML = `
     <p><strong>Référence:</strong> ${supply.REF || '-'}</p>
     <p><strong>Produit:</strong> ${product ? product.LIBELLE : supply.PRODUIT_ID}</p>
-    <p><strong>Quantité:</strong> ${supply.QTE}</p>
-    <p><strong>Prix unitaire:</strong> ${parseFloat(supply.PRIX_ACQUIS).toFixed(2)} €</p>
-    <p><strong>Total:</strong> ${(supply.QTE * supply.PRIX_ACQUIS).toFixed(2)} €</p>
+    <p><strong>Quantité:</strong> ${supply.QUANTITE !== undefined ? quantite : 'undefined'}</p>
+    <p><strong>Prix unitaire:</strong> ${!isNaN(prixAcquis) ? prixAcquis.toFixed(2) : '0.00'} XOF</p>
+    <p><strong>Total:</strong> ${!isNaN(total) ? total.toFixed(2) : '0.00'} XOF</p>
     <p><strong>Fournisseur:</strong> ${supplier ? supplier.NOM : supply.FOURNISSEUR_ID}</p>
     <p><strong>Notes:</strong> ${supply.NOTES || '-'}</p>
     <p><strong>Date:</strong> ${new Date(supply.DATE_APPROV).toLocaleDateString('fr-FR')}</p>
